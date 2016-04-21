@@ -8,4 +8,9 @@
     <string name="view_navigation_open">Open</string>
     <string name="view_navigation_close">Close</string>
 
+
+    <string name="tab_keys">Stored Keys</string>
+    <string name="tab_hotspots">Hotspots</string>
+    <string name="tab_setting">Settings</string>
+
 </resources>

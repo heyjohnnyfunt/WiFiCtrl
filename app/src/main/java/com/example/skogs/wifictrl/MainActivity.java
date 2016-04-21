@@ -7,9 +7,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
-import com.example.skogs.wifictrl.adapter.TabsPagerFragmentAdapter;
+import android.view.MenuItem;
+import com.example.skogs.wifictrl.adapter.TabsFragmentAdapter;
 
 /**
  * Created by skogs on 18.04.2016.
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initTabs() {
         viewPager = (ViewPager) findViewById(R.id.viewPager);
-        TabsPagerFragmentAdapter adapter = new TabsPagerFragmentAdapter(getSupportFragmentManager());
+        TabsFragmentAdapter adapter = new TabsFragmentAdapter(this, getSupportFragmentManager());
         viewPager.setAdapter(adapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
