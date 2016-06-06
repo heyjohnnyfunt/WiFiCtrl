@@ -1,16 +1,21 @@
 package com.example.skogs.wifictrl
 
 import android.app.Activity
-import android.os.Bundle
-import android.net.wifi.WifiManager
-import android.content.Context
-import android.widget.Toast
+import android.app.Fragment
 import android.content.BroadcastReceiver
-import android.content.IntentFilter
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.net.wifi.WifiManager
+import android.os.Bundle
+import android.support.design.widget.NavigationView
+import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
-import android.app.Fragment
+import android.widget.Toast
 import com.example.skogs.wifictrl.fragment.WifiDetailFragment
 import com.example.skogs.wifictrl.fragment.WifiListFragment
 import com.example.skogs.wifictrl.model.WifiStation
@@ -19,6 +24,9 @@ import com.example.skogs.wifictrl.model.WifiStation
  * Root activity for Wi-Fi list and details
  */
 open class WifiActivity() : Activity() {
+
+    private var toolbar: Toolbar? = null
+    private var drawerLayout: DrawerLayout? = null
 
     private var listFragment: WifiListFragment? = null
     private var detailFragment: WifiDetailFragment? = null
@@ -40,12 +48,53 @@ open class WifiActivity() : Activity() {
         setContentView(R.layout.activity_wifi)
         setTitle(R.string.app_name)
 
+        initToolbar()
+        initNavigationView()
+
         transitionToList()
 
         wifiManager = getSystemService(Context.WIFI_SERVICE) as WifiManager
         if (wifiManager?.isWifiEnabled() == false) {
             Toast.makeText(this, R.string.prompt_enabling_wifi, Toast.LENGTH_SHORT).show()
             wifiManager?.setWifiEnabled(true)
+        }
+    }
+
+    private fun initToolbar() {
+        toolbar = findViewById(R.id.toolbar) as Toolbar
+        toolbar!!.setTitle(R.string.app_name)
+        toolbar!!.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.refresh -> {
+                    refreshList()
+                }
+            }
+            true
+        }
+        toolbar!!.inflateMenu(R.menu.menu)
+    }
+
+    private fun initNavigationView() {
+        drawerLayout = findViewById(R.id.drawer_layout) as DrawerLayout
+
+        val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.view_navigation_open, R.string.view_navigation_close)
+        drawerLayout!!.setDrawerListener(toggle)
+        toggle.syncState()
+
+        // navigation view on the left side
+        val navigationView = findViewById(R.id.navigation) as NavigationView
+
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            drawerLayout!!.closeDrawers()
+            when (menuItem.itemId) {
+                R.id.actionHotspotsItem -> {
+                    transitionToList()
+                }
+                R.id.refresh -> {
+                    refreshList()
+                }
+            }
+            true
         }
     }
 
@@ -80,7 +129,7 @@ open class WifiActivity() : Activity() {
 
     override fun onPause() {
         unregisterReceiver(wifiReceiver)
-        super<Activity>.onPause()
+        super.onPause()
     }
 
     fun transition(fragment: Fragment, add: Boolean = false) {
@@ -98,7 +147,7 @@ open class WifiActivity() : Activity() {
     }
 
     fun transitionToDetail(item: WifiStation) {
-        detailFragment = WifiDetailFragment.newInstance()
+        detailFragment = WifiDetailFragment.newInstance(item)
         transition(detailFragment!!, add = true)
     }
 

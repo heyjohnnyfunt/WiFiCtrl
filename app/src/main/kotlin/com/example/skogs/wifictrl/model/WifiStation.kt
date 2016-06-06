@@ -11,7 +11,8 @@ data class WifiStation(
         val ssid: String?,
         val bssid: String? = null,
         val frequency: Int? = null,
-        val level: Int? = null) : Serializable {
+        val level: Int? = null,
+        val capabilities: String? = null) : Serializable {
 
     companion object {
         /**
@@ -24,7 +25,8 @@ data class WifiStation(
                     ssid = sr.SSID,
                     bssid = sr.BSSID,
                     frequency = sr.frequency,
-                    level = sr.level
+                    level = sr.level,
+                    capabilities = sr.capabilities
             )
         }
 
@@ -39,6 +41,17 @@ data class WifiStation(
                 stations.add(newInstance(sr))
             }
             return stations
+        }
+
+        fun getSecurity(result: WifiStation): Int {
+            if (result.capabilities!!.contains("WEP")) {
+                return 0;
+            } else if (result.capabilities.contains("PSK")) {
+                return 1;
+            } else if (result.capabilities.contains("EAP")) {
+                return 2;
+            }
+            return -1;
         }
     }
 }

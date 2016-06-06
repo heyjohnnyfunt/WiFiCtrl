@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
-          android:title="@string/menu_item_refresh"
-          android:orderInCategory="1"
-          android:icon="@mipmap/ic_refresh"/>
+    <group android:checkableBehavior="single">
+        <item
+                android:id="@+id/refresh"
+                android:title="@string/menu_item_refresh"
+                android:orderInCategory="1"
+                android:icon="@mipmap/ic_refresh"/>
 
-    <item android:id="@+id/actionHotspotsItem"
-          android:title="@string/menu_item_hotspots"
-          android:orderInCategory="1"
-          android:icon="@mipmap/ic_access_point_network"/>
+        <item
+                android:id="@+id/actionHotspotsItem"
+                android:title="@string/menu_item_hotspots"
+                android:orderInCategory="2"
+                android:icon="@mipmap/ic_access_point_network"/>
+    </group>
+
+    <item android:title="Communicate"
+          android:orderInCategory="3">
+        <menu>
+            <item
+                    android:id="@+id/nav_share"
+                    android:icon="@android:drawable/ic_menu_share"
+                    android:title="Share"/>
+            <item
+                    android:id="@+id/nav_send"
+                    android:icon="@android:drawable/ic_menu_send"
+                    android:title="Send"/>
+        </menu>
+    </item>
+
 </menu>

@@ -9,7 +9,9 @@ import android.view.ViewGroup
 import android.view.View
 import android.widget.TextView
 import android.os.SystemClock
+import android.util.Log
 import com.example.skogs.wifictrl.R
+import com.example.skogs.wifictrl.model.WifiStation
 import rx.schedulers.Schedulers
 import rx.subscriptions.Subscriptions
 
@@ -18,29 +20,26 @@ import rx.subscriptions.Subscriptions
  *
  * @author Mike Gouline
  */
-open class WifiDetailFragment() : Fragment() {
+open class WifiDetailFragment : Fragment() {
+
+
     companion object {
-        fun newInstance(): WifiDetailFragment {
+        var currentWifi: WifiStation? = null
+
+        fun newInstance(item: WifiStation): WifiDetailFragment {
+            currentWifi = item;
+            println(currentWifi.toString())
             return WifiDetailFragment()
         }
     }
 
-    private var contentTextView: TextView? = null
+    private var ssidTextView: TextView? = null
+    private var authTextView: TextView? = null
 
-    private var strings: Observable<String>? = null
-    private var subscription = Subscriptions.empty()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super<Fragment>.onCreate(savedInstanceState)
+        super.onCreate(savedInstanceState)
 
-        strings = Observable.range(0, 10)
-                ?.map({ num ->
-                    num.toString()
-                })
-                ?.doOnNext { SystemClock.sleep(1000) }
-                ?.subscribeOn(Schedulers.newThread())
-                ?.observeOn(AndroidSchedulers.mainThread())
-                ?.cache()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -48,13 +47,19 @@ open class WifiDetailFragment() : Fragment() {
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-        super<Fragment>.onViewCreated(view, savedInstanceState)
+        super.onViewCreated(view, savedInstanceState)
 
-        contentTextView = view?.findViewById(R.id.txt_content) as TextView
-        contentTextView?.setText(R.string.prompt_loading)
+        ssidTextView = view?.findViewById(R.id.wlan_ssid) as TextView
+        authTextView = view?.findViewById(R.id.wlan_auth) as TextView
 
-        subscription = strings?.subscribe({ txt ->
-            contentTextView?.setText(txt)
-        })
+        ssidTextView?.text = currentWifi?.ssid
+        authTextView?.text = currentWifi?.capabilities
+
+        val security = WifiStation.getSecurity(currentWifi!!);
+
+        if (security !== 0 || security !== -1){
+            view?.findViewById(R.id.password_input)?.visibility = View.VISIBLE
+        }
+
     }
 }

@@ -13,22 +13,22 @@
     <string name="tab_setting">Settings</string>
 
 
-
+    <!-- Text view hints -->
     <string name="action_refresh">Refresh</string>
     <string name="action_settings">Settings</string>
     <string name="action_scan_wifi">Wi-Fi Scan</string>
+    <string name="action_connect_wifi">Connect to Wi-Fi</string>
+    <string name="password">Password:</string>
+    <string name="password_hint">WPA/WEP etc.</string>
+    <string name="SSID">SSID</string>
+    <string name="Auth">Auth</string>
 
     <string name="prompt_loading">Loading&#8230;</string>
     <string name="prompt_settings_not_implemented">Settings not implemented</string>
     <string name="prompt_enabling_wifi">Enabling Wi-Fi&#8230;</string>
 
-    <string name="welcome_title">Welcome to the Kotlin Demo!</string>
-    <string name="welcome_message">This application is intended to scan nearby Wi-Fi base stations and give you basic information about each one.</string>
-
     <string name="station_frequency">%1$s MHz</string>
     <string name="station_level">%1$s dBm</string>
-
-
 
     <string-array name="menu_items">
         <item>Stored Keys</item>
