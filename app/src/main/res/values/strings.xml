@@ -1,27 +1,35 @@
 <resources>
-    <string name="app_name">Wi-Fi Controller</string>
+    <string name="app_name">Ctrl + WiFi</string>
     <string name="search_title">Search</string>
 
     <string name="menu_item_hotspots">WiFi Hotspots</string>
     <string name="menu_item_refresh">Refresh</string>
+    <string name="menu_item_disconnect">Disconnect</string>
 
     <string name="view_navigation_open">Open</string>
     <string name="view_navigation_close">Close</string>
 
-    <string name="tab_keys">Stored Keys</string>
-    <string name="tab_hotspots">Hotspots</string>
-    <string name="tab_setting">Settings</string>
+    <string name="hotspots">Hotspots</string>
+    <string name="settings">Settings</string>
+    <string name="communicate">Communicate</string>
 
+    <!-- Preference strings -->
+    <string name="known_hotspots">Known hotspots</string>
+    <string name="key">Key</string>
+    <string name="about">About</string>
+    <string name="author">Andrew Dakhnovich</string>
+    <string name="email">heyjohnnyfunt@gmail.com</string>
 
     <!-- Text view hints -->
     <string name="action_refresh">Refresh</string>
     <string name="action_settings">Settings</string>
     <string name="action_scan_wifi">Wi-Fi Scan</string>
     <string name="action_connect_wifi">Connect to Wi-Fi</string>
-    <string name="password">Password:</string>
+    <string name="connected">Connected</string>
+    <string name="password">Password</string>
     <string name="password_hint">WPA/WEP etc.</string>
-    <string name="SSID">SSID</string>
-    <string name="Auth">Auth</string>
+    <string name="ssid">SSID</string>
+    <string name="auth">Authentication</string>
 
     <string name="prompt_loading">Loading&#8230;</string>
     <string name="prompt_settings_not_implemented">Settings not implemented</string>

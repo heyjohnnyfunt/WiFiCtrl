@@ -36,9 +36,9 @@ class TabsFragmentAdapter(private val context: Context, fm: FragmentManager) : F
     }
 
     private fun initTabMaps(context: Context) {
-        tabs = HashMap<Int, AbstractTabFragment>()
-        tabs!!.put(0, KeysFragment.getInstance(context))
+//        tabs = HashMap<Int, AbstractTabFragment>()
+//        tabs!!.put(0, KeysFragment.getInstance(context))
 //        tabs!!.put(1, HotspotFragment.getInstance(context))
-        tabs!!.put(2, SettingsFragment.getInstance(context))
+//        tabs!!.put(2, SettingsFragment.getInstance(context))
     }
 }

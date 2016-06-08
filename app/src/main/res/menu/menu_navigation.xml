@@ -14,10 +14,21 @@
                 android:title="@string/menu_item_hotspots"
                 android:orderInCategory="2"
                 android:icon="@mipmap/ic_access_point_network"/>
+        <item
+                android:id="@+id/disconnect"
+                android:title="@string/menu_item_disconnect"
+                android:orderInCategory="3"
+                android:icon="@mipmap/ic_wifi_off"/>
+
+        <item
+                android:id="@+id/settings"
+                android:title="@string/settings"
+                android:orderInCategory="4"
+                android:icon="@mipmap/ic_settings"/>
     </group>
 
-    <item android:title="Communicate"
-          android:orderInCategory="3">
+    <item android:title="@string/communicate"
+          android:orderInCategory="5">
         <menu>
             <item
                     android:id="@+id/nav_share"

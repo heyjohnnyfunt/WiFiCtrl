@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:card="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:paddingTop="5dp"
+              android:paddingBottom="5dp"
+              android:paddingLeft="10dp"
+              android:paddingRight="10dp"
+              android:layout_marginTop="3dp"
+              android:layout_marginBottom="3dp"
+              android:layout_marginLeft="6dp"
+              android:layout_marginRight="6dp">
+
+    <android.support.v7.widget.CardView
+            style="@style/MyCardViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            card:cardUseCompatPadding="true">
+
+        <LinearLayout
+                android:id="@+id/cardView"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dp">
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:id="@+id/txt_ssid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="8pt"
+                        android:paddingBottom="6dp"
+                        android:textColor="@color/colorWhite"
+                        android:layout_marginRight="@dimen/hint_horizontal_margin"
+                        android:layout_marginEnd="@dimen/hint_horizontal_margin"/>
+
+                <TextView
+                        android:id="@+id/connected_ssid"
+                        android:text="@string/connected"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="5pt"
+                        android:paddingBottom="6dp"
+                        android:textColor="@color/colorGreen"
+                        android:visibility="invisible"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:id="@+id/txt_bssid"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/activity_horizontal_margin"
+                        android:layout_marginEnd="@dimen/activity_horizontal_margin"/>
+                <TextView
+                        android:id="@+id/txt_frequency"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="@dimen/activity_horizontal_margin"
+                        android:layout_marginEnd="@dimen/activity_horizontal_margin"/>
+
+                <TextView
+                        android:id="@+id/txt_level"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/><!--
+                android:ellipsize="end"
+                android:lines="1"-->
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

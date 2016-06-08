@@ -1,18 +1,22 @@
 package com.example.skogs.wifictrl.fragment
 
 import android.app.ListFragment
+import android.content.Context
+import android.net.ConnectivityManager
 import android.net.wifi.ScanResult
+import android.net.wifi.WifiConfiguration
+import android.net.wifi.WifiManager
 import android.os.Bundle
-import android.widget.ArrayAdapter
+import android.text.TextUtils
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.content.Context
-import android.view.LayoutInflater
-import android.widget.TextView
 import android.widget.ListView
 import com.example.skogs.wifictrl.R
 import com.example.skogs.wifictrl.WifiActivity
+import com.example.skogs.wifictrl.adapter.WifiListAdapter
 import com.example.skogs.wifictrl.model.WifiStation
+import java.util.*
 
 /**
  * Fragment for listing Wi-Fi base stations.
@@ -29,7 +33,7 @@ open class WifiListFragment() : ListFragment() {
     private var emptyView: View? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_wifi_list, container, false)
+        return inflater.inflate(R.layout.fragment_hotspots, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -37,23 +41,28 @@ open class WifiListFragment() : ListFragment() {
 
         emptyView = view.findViewById(R.id.progress)
 
-        setListAdapter(WifiListAdapter(getActivity()))
-        getListView().setEmptyView(emptyView)
+        listAdapter = WifiListAdapter(activity, getCurrentWifi(activity)!!.SSID)
+        listView.emptyView = emptyView
     }
 
     override fun onResume() {
+
         super.onResume()
 
-        val activity = getActivity()
+        val activity = activity
+
         if (activity is WifiActivity) {
             activity.onResumeFragment(this)
+            activity.updateConnectedWifi()
         }
     }
 
     override fun onListItemClick(l: ListView, v: View, position: Int, id: Long) {
+
         super.onListItemClick(l, v, position, id)
 
-        val activity = getActivity()
+        val activity = activity
+
         if (activity is WifiActivity) {
             val item = l.getItemAtPosition(position) as WifiStation
             activity.transitionToDetail(item)
@@ -66,14 +75,24 @@ open class WifiListFragment() : ListFragment() {
      * @param stations List of scan results.
      */
     fun updateItems(stations: List<ScanResult>? = null) {
-        val adapter = getListAdapter()
+
+        val adapter = listAdapter
+
+        // ScanResult comparator
+        val comparator: Comparator<ScanResult> = Comparator { lhs, rhs -> if (lhs.level > rhs.level) -1 else if (lhs.level === rhs.level) 0 else 1 }
+
         if (adapter is WifiListAdapter) {
+
             adapter.clear()
+
             if (stations != null) {
-                val emptyVisible: Int = if (stations.size > 0) View.VISIBLE else View.GONE
-                emptyView?.setVisibility(emptyVisible)
+
+                emptyView?.visibility = if (stations.size > 0) View.VISIBLE else View.GONE
+                Collections.sort(stations, comparator);
+
                 adapter.addAll(WifiStation.newList(stations))
             }
+
             adapter.notifyDataSetChanged()
         }
     }
@@ -85,29 +104,36 @@ open class WifiListFragment() : ListFragment() {
         updateItems()
     }
 
-    /**
-     * Array adapter for stations.
-     */
-    class WifiListAdapter(context: Context) : ArrayAdapter<WifiStation>(context, 0) {
-        val inflater = LayoutInflater.from(context)
+    fun getCurrentWifi(context: Context): WifiConfiguration? {
 
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        var currentStation: WifiConfiguration? = null
 
-            val item = getItem(position)
+        val connManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
 
-            val view = convertView ?: inflater.inflate(R.layout.list_item_wifi, parent, false)
+        if (networkInfo.isConnected) {
 
-            val ssidTextView = view.findViewById(R.id.txt_ssid) as TextView
-            val bssidTextView = view.findViewById(R.id.txt_bssid) as TextView
-            val frequencyTextView = view.findViewById(R.id.txt_frequency) as TextView
-            val levelTextView = view.findViewById(R.id.txt_level) as TextView
+            val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            val connectedInfo = wifiManager.connectionInfo
 
-            ssidTextView.text = item.ssid
-            bssidTextView.text = item.bssid
-            frequencyTextView.text = getContext().getString(R.string.station_frequency, item.frequency)
-            levelTextView.text = getContext().getString(R.string.station_level, item.level)
+            if (connectedInfo != null && !TextUtils.isEmpty(connectedInfo.ssid)) {
 
-            return view
+                var activeConfig: WifiConfiguration? = null;
+                val conn = wifiManager.configuredNetworks
+
+                conn.forEach {
+                    val wifi = it
+                    if (wifi.status == WifiConfiguration.Status.CURRENT) {
+                        activeConfig = wifi;
+                    }
+                }
+                if (activeConfig != null) {
+                    currentStation = activeConfig
+                    // erase quotes in Android < 5.0
+                    currentStation?.SSID = currentStation?.SSID?.replace("\"","")
+                }
+            }
         }
+        return currentStation
     }
 }

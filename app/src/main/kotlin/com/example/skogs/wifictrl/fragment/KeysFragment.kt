@@ -22,7 +22,7 @@ class KeysFragment : AbstractTabFragment() {
             val fragment = KeysFragment()
             fragment.arguments = args
             fragment.context = context
-            fragment.title = context.getString(R.string.tab_keys)
+            fragment.title = context.getString(R.string.key)
 
             return fragment
         }

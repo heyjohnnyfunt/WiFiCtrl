@@ -1,7 +1,12 @@
 package com.example.skogs.wifictrl.model
 
+import android.content.Context
+import android.net.ConnectivityManager
 import java.io.Serializable
 import android.net.wifi.ScanResult
+import android.net.wifi.WifiConfiguration
+import android.net.wifi.WifiManager
+import android.text.TextUtils
 import java.util.ArrayList
 
 /**
@@ -53,5 +58,7 @@ data class WifiStation(
             }
             return -1;
         }
+
+
     }
 }

@@ -2,13 +2,7 @@ package com.example.skogs.wifictrl.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import com.example.skogs.wifictrl.R
-import com.example.skogs.wifictrl.adapter.HotspotAdapter
 import java.util.*
 
 /**
@@ -25,13 +19,13 @@ class HotspotFragment : AbstractTabFragment() {
             val fragment = HotspotFragment()
             fragment.arguments = args
             fragment.context = context
-            fragment.title = context.getString(R.string.tab_hotspots)
+            fragment.title = context.getString(R.string.hotspots)
 
             return fragment
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    /*override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         viewPage = inflater!!.inflate(layoutId, container, false)
 
         val rv = viewPage!!.findViewById(R.id.wifi_list) as RecyclerView
@@ -39,7 +33,7 @@ class HotspotFragment : AbstractTabFragment() {
         rv.adapter = HotspotAdapter(createMockData())
 
         return viewPage
-    }
+    }*/
 
     private fun createMockData(): List<String> {
 
