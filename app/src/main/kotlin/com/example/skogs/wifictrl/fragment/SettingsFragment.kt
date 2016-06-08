@@ -3,6 +3,7 @@ package com.example.skogs.wifictrl.fragment
 import android.app.Activity
 import android.app.ListFragment
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,21 +35,6 @@ class SettingsFragment : ListFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
-        /*val data = arrayOf( "one", "two", "three", "four" );
-        val adapter = ArrayAdapter<String>(activity, android.R.layout.simple_list_item_1, data)
-        listAdapter = adapter*/
-        /*val storedKeys = Database.getAll(activity)
-        storedKeys?.forEach {
-            val pair = it
-            println("Key: ${pair.key}; Value: ${pair.value}")
-        }*/
-
-        /*list = view.findViewById(R.id.wlan_list) as ListView;
-        emptyView = view.findViewById(R.id.progress)
-        val adapter = SettingsAdapter(activity)
-        list!!.adapter = adapter*/
-
         emptyView = view.findViewById(R.id.progress)
         listAdapter = SettingsAdapter(activity)
         listView.emptyView = emptyView
@@ -64,12 +50,35 @@ class SettingsFragment : ListFragment() {
             updateItems(activity)
         }
     }
+
+    override fun onListItemClick(l: ListView, v: View, position: Int, id: Long) {
+
+        super.onListItemClick(l, v, position, id)
+
+        val activity = activity
+
+        val item = listAdapter.getItem(position) as Map.Entry<*, *>
+
+        val builder = AlertDialog.Builder(activity);
+        builder.setMessage("Delete ${item.key} key? You will not be able to trust this hotspot.")
+                .setPositiveButton("ОК") {
+                    dialog, whichButton ->
+                    Database.remove(activity, item.key.toString())
+                    updateItems(activity)
+                }
+                .setNegativeButton("CANCEL") {
+                    dialog, whichButton ->
+                }
+        val alert = builder.create();
+        alert.show();
+    }
+
     /**
      * Updates adapter and calls notify.
      *
      * @param keyPairs List of scan results.
      */
-    fun updateItems(activity: Activity/*keyPairs: MutableMap<String, *>? = null*/) {
+    fun updateItems(activity: Activity) {
 
         val keyPairs = Database.getAll(activity)
         val adapter = listAdapter

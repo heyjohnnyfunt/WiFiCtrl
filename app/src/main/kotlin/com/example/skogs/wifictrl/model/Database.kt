@@ -10,7 +10,6 @@ class Database {
     companion object {
 
         fun save(activity: Activity, chosenWifi: WifiStation){
-
             val sharedPref = activity.getPreferences(Context.MODE_PRIVATE)
             val editor = sharedPref.edit()
             editor.putString(chosenWifi.ssid, chosenWifi.bssid)
@@ -20,6 +19,16 @@ class Database {
         fun getAll(activity: Activity): MutableMap<String, *>? {
             val sharedPref = activity.getPreferences(Context.MODE_PRIVATE)
             return sharedPref.all
+        }
+
+        fun remove(activity: Activity, key: String) {
+            val sharedPref = activity.getPreferences(Context.MODE_PRIVATE)
+            if(sharedPref.contains(key)) {
+                val editor = sharedPref.edit()
+                editor.remove(key)
+                editor.apply()
+            }
+
         }
     }
 }

@@ -41,7 +41,7 @@ open class WifiListFragment() : ListFragment() {
 
         emptyView = view.findViewById(R.id.progress)
 
-        listAdapter = WifiListAdapter(activity, getCurrentWifi(activity)!!.SSID)
+        listAdapter = WifiListAdapter(activity, getCurrentWifi(activity)?.SSID)
         listView.emptyView = emptyView
     }
 
@@ -77,6 +77,8 @@ open class WifiListFragment() : ListFragment() {
     fun updateItems(stations: List<ScanResult>? = null) {
 
         val adapter = listAdapter
+
+        println("listAdapter class: " + listAdapter.javaClass.name)
 
         // ScanResult comparator
         val comparator: Comparator<ScanResult> = Comparator { lhs, rhs -> if (lhs.level > rhs.level) -1 else if (lhs.level === rhs.level) 0 else 1 }

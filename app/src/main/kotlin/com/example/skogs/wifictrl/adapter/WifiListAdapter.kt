@@ -17,10 +17,10 @@ import com.example.skogs.wifictrl.model.WifiStation
 /**
  * Array adapter for stations.
  */
-class WifiListAdapter(context: Context, currentSsid: String) : ArrayAdapter<WifiStation>(context, 0) {
+class WifiListAdapter(context: Context, currentSsid: String?) : ArrayAdapter<WifiStation>(context, 0) {
 
     private val inflater = LayoutInflater.from(context)
-    private val ssid = currentSsid
+    val currentSsid = currentSsid?: null
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
 
@@ -34,9 +34,10 @@ class WifiListAdapter(context: Context, currentSsid: String) : ArrayAdapter<Wifi
 
         val isConnected = view.findViewById(R.id.connected_ssid) as TextView
 
-        if (item.ssid == this.ssid){
-            println("CONNECTED WIFI ==================> " + item.ssid)
+        if (currentSsid != null && item.ssid == currentSsid){
             isConnected.visibility = View.VISIBLE;
+        } else {
+            isConnected.visibility = View.INVISIBLE;
         }
 
         ssidView.text = item.ssid

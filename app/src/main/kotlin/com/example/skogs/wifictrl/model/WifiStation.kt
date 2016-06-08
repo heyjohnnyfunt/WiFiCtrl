@@ -22,7 +22,6 @@ data class WifiStation(
     companion object {
         /**
          * Creates a new instance from a scan result.
-         *
          * @param sr A scan result.
          */
         fun newInstance(sr: ScanResult): WifiStation {
@@ -37,7 +36,6 @@ data class WifiStation(
 
         /**
          * Creates a new list of Wi-Fi stations from a list of scan results.
-         *
          * @param srs List of scan results.
          */
         fun newList(srs: List<ScanResult>): List<WifiStation> {
@@ -48,17 +46,20 @@ data class WifiStation(
             return stations
         }
 
-        fun getSecurity(result: WifiStation): Int {
-            if (result.capabilities!!.contains("WEP")) {
+        /**
+         * Get Wi-Fi AP security type
+         * @param station Specified Wi-Fi station
+         */
+        fun getSecurity(station: WifiStation): Int {
+            if (station.capabilities!!.contains("WEP")) {
                 return 0;
-            } else if (result.capabilities.contains("PSK")) {
+            } else if (station.capabilities.contains("PSK")) {
                 return 1;
-            } else if (result.capabilities.contains("EAP")) {
+            } else if (station.capabilities.contains("EAP")) {
                 return 2;
             }
             return -1;
         }
-
 
     }
 }

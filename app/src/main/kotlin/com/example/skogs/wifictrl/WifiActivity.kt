@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.support.design.widget.NavigationView
@@ -28,9 +29,10 @@ open class WifiActivity() : Activity() {
     private var drawerLayout: DrawerLayout? = null
     private var navigationView: NavigationView? = null
 
-    private var listFragment: WifiListFragment? = null
-    private var detailFragment: WifiDetailFragment? = null
-    private var listFragmentVisible: Boolean = false
+    private var wifiList: WifiListFragment? = null
+    private var wifiDetail: WifiDetailFragment? = null
+    private var wifiListVisible: Boolean = false
+    private var connectedWifi: WifiConfiguration? = null
 
     private var wifiManager: WifiManager? = null
 
@@ -39,8 +41,8 @@ open class WifiActivity() : Activity() {
 
             val results = wifiManager?.scanResults
 
-            if (listFragmentVisible && results != null) {
-                listFragment?.updateItems(results)
+            if (wifiListVisible && results != null) {
+                wifiList?.updateItems(results)
             }
         }
     }
@@ -117,11 +119,10 @@ open class WifiActivity() : Activity() {
 
     fun onResumeFragment(fragment: Fragment) {
         toolbar!!.setTitle(R.string.app_name)
-        listFragmentVisible = false
+        wifiListVisible = false
 
-        if (fragment == listFragment) {
-            listFragmentVisible = true
-
+        if (fragment == wifiList) {
+            wifiListVisible = true
             refreshList()
         }
     }
@@ -141,22 +142,27 @@ open class WifiActivity() : Activity() {
     }
 
     fun transitionToList() {
+
         toolbar!!.setTitle(R.string.app_name)
-        listFragment = WifiListFragment.newInstance()
-        transition(listFragment!!)
+
+        wifiList = WifiListFragment.newInstance()
+        transition(wifiList!!)
     }
 
     fun transitionToSettings() {
+
         toolbar!!.setTitle(R.string.settings)
+
         val settingsFragment = SettingsFragment.newInstance()
-//        settingsFragment.updateItems(this)
         transition(settingsFragment, add = true)
     }
 
     fun transitionToDetail(item: WifiStation) {
+
         toolbar!!.title = item.ssid.toString()
-        detailFragment = WifiDetailFragment.newInstance(item)
-        transition(detailFragment!!, add = true)
+
+        wifiDetail = WifiDetailFragment.newInstance(item)
+        transition(wifiDetail!!, add = true)
     }
 
     private fun disconnect() {
@@ -166,17 +172,17 @@ open class WifiActivity() : Activity() {
     }
 
     fun updateConnectedWifi() {
-        val connectedWifi = listFragment?.getCurrentWifi(this)
+        connectedWifi = wifiList?.getCurrentWifi(this)
 
         val currentWifiTextView = findViewById(R.id.connected_wifi_ssid) as TextView
         if (connectedWifi != null)
-            currentWifiTextView.text = connectedWifi.SSID
+            currentWifiTextView.text = connectedWifi?.SSID
         else
             currentWifiTextView.text = "Not connected"
     }
 
     private fun refreshList() {
-        listFragment?.clearItems()
+        wifiList?.clearItems()
         wifiManager?.startScan()
         updateConnectedWifi()
     }
