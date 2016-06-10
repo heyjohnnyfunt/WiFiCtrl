@@ -78,8 +78,6 @@ open class WifiListFragment() : ListFragment() {
 
         val adapter = listAdapter
 
-        println("listAdapter class: " + listAdapter.javaClass.name)
-
         // ScanResult comparator
         val comparator: Comparator<ScanResult> = Comparator { lhs, rhs -> if (lhs.level > rhs.level) -1 else if (lhs.level === rhs.level) 0 else 1 }
 

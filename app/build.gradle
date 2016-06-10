@@ -55,8 +55,11 @@ dependencies {
     compile 'com.android.support:design:22.2.1'
     compile 'com.android.support:cardview-v7:22.+'
     compile 'com.android.support:recyclerview-v7:22.+'
+
     compile 'de.hdodenhof:circleimageview:2.0.0'
     compile ('io.socket:socket.io-client:0.7.0') {
         exclude group: 'org.json', module: 'json'
     }
+
+    compile 'org.whispersystems:curve25519-android:0.2.4'
 }

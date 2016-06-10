@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.os.Bundle
@@ -25,16 +26,21 @@ import com.example.skogs.wifictrl.model.WifiStation
  */
 open class WifiActivity() : Activity() {
 
-    private var toolbar: Toolbar? = null
-    private var drawerLayout: DrawerLayout? = null
-    private var navigationView: NavigationView? = null
+    companion object {
 
-    private var wifiList: WifiListFragment? = null
-    private var wifiDetail: WifiDetailFragment? = null
-    private var wifiListVisible: Boolean = false
-    private var connectedWifi: WifiConfiguration? = null
+        private var connectedWifi: WifiConfiguration? = null
 
-    private var wifiManager: WifiManager? = null
+        private var toolbar: Toolbar? = null
+        private var drawerLayout: DrawerLayout? = null
+        private var navigationView: NavigationView? = null
+
+        private var wifiList: WifiListFragment? = null
+        private var wifiDetail: WifiDetailFragment? = null
+        private var wifiListVisible: Boolean = false
+
+        private var wifiManager: WifiManager? = null
+    }
+
 
     private val wifiReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -43,6 +49,15 @@ open class WifiActivity() : Activity() {
 
             if (wifiListVisible && results != null) {
                 wifiList?.updateItems(results)
+            }
+
+            val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager;
+            val activeNetInfo = connectivityManager.activeNetworkInfo;
+
+            if (activeNetInfo != null && activeNetInfo.type == ConnectivityManager.TYPE_WIFI) {
+                Toast.makeText(context, "Wifi Connected", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Wifi Not Connected", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -142,49 +157,62 @@ open class WifiActivity() : Activity() {
     }
 
     fun transitionToList() {
-
         toolbar!!.setTitle(R.string.app_name)
-
         wifiList = WifiListFragment.newInstance()
         transition(wifiList!!)
     }
 
     fun transitionToSettings() {
-
         toolbar!!.setTitle(R.string.settings)
-
         val settingsFragment = SettingsFragment.newInstance()
         transition(settingsFragment, add = true)
     }
 
     fun transitionToDetail(item: WifiStation) {
-
         toolbar!!.title = item.ssid.toString()
-
         wifiDetail = WifiDetailFragment.newInstance(item)
+
+        val args = Bundle();
+        if (connectedWifi != null) {
+            args.putCharArray(Constants.connctedWifiArg, connectedWifi!!.SSID!!.toCharArray());
+        } else {
+            args.putCharArray(Constants.connctedWifiArg, null);
+        }
+
+        wifiDetail!!.arguments = args;
         transition(wifiDetail!!, add = true)
     }
 
-    private fun disconnect() {
-        wifiManager!!.disconnect();
+    fun disconnect() {
+        val args = Bundle();
+        args.putCharArray(Constants.connctedWifiArg, null);
+        wifiDetail?.arguments = args;
+
         val currentWifiTextView = findViewById(R.id.connected_wifi_ssid) as TextView
         currentWifiTextView.text = "Not connected"
-    }
 
-    fun updateConnectedWifi() {
-        connectedWifi = wifiList?.getCurrentWifi(this)
-
-        val currentWifiTextView = findViewById(R.id.connected_wifi_ssid) as TextView
-        if (connectedWifi != null)
-            currentWifiTextView.text = connectedWifi?.SSID
-        else
-            currentWifiTextView.text = "Not connected"
+        val networkId = wifiManager?.connectionInfo?.networkId;
+        wifiManager?.removeNetwork(networkId as Int);
+        wifiManager?.saveConfiguration();
+        wifiManager?.disconnect();
     }
 
     private fun refreshList() {
         wifiList?.clearItems()
         wifiManager?.startScan()
         updateConnectedWifi()
+    }
+
+    fun updateConnectedWifi() {
+        connectedWifi = wifiList?.getCurrentWifi(this)
+
+        val currentWifiTextView = findViewById(R.id.connected_wifi_ssid) as TextView
+
+        if (connectedWifi != null) {
+            currentWifiTextView.text = connectedWifi?.SSID
+        } else {
+            currentWifiTextView.text = "Not connected"
+        }
     }
 
 

@@ -7,4 +7,5 @@ object Constants {
     val TAB_1 = 0
     val TAB_2 = 1
     val TAB_3 = 2
+    val connctedWifiArg = "connectedWifi"
 }
