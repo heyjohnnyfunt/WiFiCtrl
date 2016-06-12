@@ -21,9 +21,12 @@ import com.example.skogs.wifictrl.model.WifiStation
 import io.socket.client.IO
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
+import net.i2p.crypto.eddsa.EdDSAEngine
+import net.i2p.crypto.eddsa.EdDSAPublicKey
+import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable
+import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec
 import org.json.JSONException
 import org.json.JSONObject
-import java.math.BigInteger
 import java.security.SecureRandom
 
 /**
@@ -37,7 +40,8 @@ open class WifiDetailFragment : Fragment() {
 
         private val PORT = "8888"
 
-        private var randomString: String ? = null
+        private var randomBytes: ByteArray ? = null
+        private var randomByteString: String ? = null
         private var chosenWifi: WifiStation? = null
         private var mSocket: Socket? = null;
         private var isCurrentWifi: Boolean = false
@@ -162,11 +166,12 @@ open class WifiDetailFragment : Fragment() {
                         3 -> {
                             val activity = activity
                             if (activity is WifiActivity) {
+                                disconnectSocket()
                                 activity.disconnect()
                                 confirmAlert("Successfully disconnected");
-                                val connectBtn = view?.findViewById(R.id.connect_btn) as Button
-                                connectBtn.text = getString(R.string.authenticate)
+                                connectBtn?.text = getString(R.string.action_connect_wifi)
                                 isCurrentWifi = false
+                                arguments.putCharArray(Constants.connctedWifiArg, null);
                             }
                         }
                     }
@@ -239,6 +244,7 @@ open class WifiDetailFragment : Fragment() {
         list.forEach {
             if (it.SSID != null && it.SSID.equals("\"${chosenWifi.ssid}\"")) {
                 wifiManager.disconnect();
+                arguments.putCharArray(Constants.connctedWifiArg, null);
                 wifiManager.enableNetwork(it.networkId, true);
                 result = wifiManager.reconnect();
             }
@@ -263,10 +269,33 @@ open class WifiDetailFragment : Fragment() {
         mSocket?.emit("deriveKey")
     }
 
+    private fun hexStringToByteArray(s: String): ByteArray {
+        val len = s.length
+        val data = ByteArray(len / 2)
+        var i = 0
+        while (i < len) {
+            data[i / 2] = ((Character.digit(s[i], 16) shl 4) + Character.digit(s[i + 1], 16)).toByte()
+            i += 2
+        }
+        return data
+    }
+
     fun emitCheckKeyRequest() {
         connectSocket();
-        randomString = BigInteger(130, SecureRandom()).toString(32)
-        mSocket?.emit("checkKey", randomString)
+        val randomBytes = ByteArray(32)
+        SecureRandom().nextBytes(randomBytes);
+
+        val sb = StringBuffer()
+        for (b in randomBytes) {
+            sb.append(String.format("%02X", b));
+        }
+//        randomBytes = BigInteger(130, SecureRandom()).toByteArray()
+
+        randomByteString = sb.toString()
+        println("******************* random bytes = " + randomByteString)
+//        println("******************* random bytes = " + Hex.encodeHex(randomBytes))
+
+        mSocket?.emit("checkKey", randomByteString)
     }
 
     fun connectSocket() {
@@ -297,14 +326,31 @@ open class WifiDetailFragment : Fragment() {
         mSocket?.off("deriveKeyResponse", onNewKeyDerivation);
     }
 
-    fun checkKey(receivedKey: String): Boolean {
+    fun checkKey(sign: String): Boolean {
 
-        val storedKey = Database.get(activity, chosenWifi!!)
+        val publicKey = Database.get(activity, chosenWifi!!)
 
-        if (storedKey == receivedKey) return true
+        println("********************** sign = " + sign)
+        println("********************** randomByteString = " + randomByteString!!)
+        val result: Boolean;
+        try {
+            val sgr = EdDSAEngine()
+            val spec = EdDSANamedCurveTable.getByName("ed25519-sha-512")
+            val pubKey = EdDSAPublicKeySpec(hexStringToByteArray(publicKey!!), spec)
+            val vk = EdDSAPublicKey(pubKey)
+            sgr.initVerify(vk)
+            sgr.update(hexStringToByteArray(randomByteString!!))
+            result = sgr.verify(hexStringToByteArray(sign))
+        } catch (e: Exception) {
+            result = false
+            println(e)
+        }
+
+        if (result) return true
 
         return false;
     }
+
 
     private val onKeyCheck = Emitter.Listener { args ->
         activity.runOnUiThread(Runnable {
@@ -314,7 +360,7 @@ open class WifiDetailFragment : Fragment() {
                 receivedString = data.getString("encodedString")
                 val result = checkKey(receivedString)
                 if (result) {
-                    confirmAlert("Received string: $receivedString. Key checking successful. Traffic unblocked")
+                    confirmAlert("Received string: $receivedString.\nKey checking successful. Traffic unblocked")
                 } else {
                     unsuccessfulKeyCheckAlert()
                 }

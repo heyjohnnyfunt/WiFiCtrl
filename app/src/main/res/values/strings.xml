@@ -25,7 +25,9 @@
     <string name="action_settings">Settings</string>
     <string name="action_scan_wifi">Wi-Fi Scan</string>
     <string name="action_connect_wifi">Connect</string>
+    <string name="connecting">Connecting</string>
     <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
     <string name="password">Password</string>
     <string name="password_hint">WPA/WEP etc.</string>
     <string name="ssid">SSID</string>

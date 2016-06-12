@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
+import android.net.VpnService
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiManager
 import android.os.Bundle
@@ -19,6 +20,8 @@ import android.widget.Toast
 import com.example.skogs.wifictrl.fragment.SettingsFragment
 import com.example.skogs.wifictrl.fragment.WifiDetailFragment
 import com.example.skogs.wifictrl.fragment.WifiListFragment
+import com.example.skogs.wifictrl.fragment.m
+import com.example.skogs.wifictrl.model.VpnFilter
 import com.example.skogs.wifictrl.model.WifiStation
 
 /**
@@ -73,6 +76,13 @@ open class WifiActivity() : Activity() {
 
         transitionToList()
 
+        /*val intent = VpnService.prepare(this);
+        if (intent != null) {
+            startActivityForResult(intent, 0);
+        } else {
+            onActivityResult(0, RESULT_OK, null);
+        }*/
+
         wifiManager = getSystemService(Context.WIFI_SERVICE) as WifiManager
         if (wifiManager?.isWifiEnabled == false) {
             Toast.makeText(this, R.string.prompt_enabling_wifi, Toast.LENGTH_SHORT).show()
@@ -80,6 +90,14 @@ open class WifiActivity() : Activity() {
         }
 
     }
+
+    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK) {
+            val intent = Intent(this, VpnFilter::class.java);
+            startService(intent);
+        }
+    }*/
 
     private fun initToolbar() {
         toolbar = findViewById(R.id.toolbar) as Toolbar
@@ -184,9 +202,6 @@ open class WifiActivity() : Activity() {
     }
 
     fun disconnect() {
-        val args = Bundle();
-        args.putCharArray(Constants.connctedWifiArg, null);
-        wifiDetail?.arguments = args;
 
         val currentWifiTextView = findViewById(R.id.connected_wifi_ssid) as TextView
         currentWifiTextView.text = "Not connected"
