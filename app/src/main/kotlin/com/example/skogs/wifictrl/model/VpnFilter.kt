@@ -31,7 +31,7 @@ class VpnFilter : VpnService(), Handler.Callback {
 
     private var mInterface: ParcelFileDescriptor? = null
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // The handler is only used to show messages.
         if (mHandler == null) {
             mHandler = Handler()
@@ -73,13 +73,27 @@ class VpnFilter : VpnService(), Handler.Callback {
         if (mThread != null) {
             mThread!!.interrupt()
         }
+        super.onDestroy();
     }
 
-    override fun handleMessage(message: Message?): Boolean {
-        if (message != null) {
-            Toast.makeText(this, message.what, Toast.LENGTH_SHORT).show()
+    @Throws(Exception::class)
+    private fun configure() {
+        // If the old interface has exactly the same parameters, use it!
+        if (mInterface != null) {
+            Log.i(TAG, "Using the previous interface")
+            return
         }
-        return true
+
+        // Configure a builder while parsing the parameters.
+        builder.setSession(TAG)//.setMtu(1500)
+        builder.addAddress("10.0.0.1", 32).addRoute("0.0.0.0", 0)
+        try {
+            mInterface!!.close()
+        } catch (e: Exception) {
+            // ignore
+        }
+
+        mInterface = builder.establish()
     }
 
     @Throws(Exception::class)
@@ -95,15 +109,18 @@ class VpnFilter : VpnService(), Handler.Callback {
         // The UDP channel can be used to pass/get ip package to/from server
         val tunnel = DatagramChannel.open()
 
+        // Protect the tunnel before connecting to avoid loopback.
+        if (!protect(tunnel.socket())) {
+            throw IllegalStateException("Cannot protect the tunnel");
+        }
+        // Connect to the server, localhost is used for demonstration only.
+        tunnel.connect(InetSocketAddress("10.0.0.1", 55555))
         // For simplicity, we use the same thread for both reading and
         // writing. Here we put the tunnel into non-blocking mode.
         tunnel.configureBlocking(false)
 
         // Allocate the buffer for a single packet.
         val packet = ByteBuffer.allocate(32767)
-
-        // Connect to the server, localhost is used for demonstration only.
-        tunnel.connect(InetSocketAddress("127.0.0.1", 8087))
 
         // Protect this socket, so package send by it will not be feedback to the vpn service.
         protect(tunnel.socket())
@@ -120,15 +137,14 @@ class VpnFilter : VpnService(), Handler.Callback {
 
             // Read the outgoing packet from the input stream.
             var length = `in`.read(packet.array())
-            Log.i(TAG, "************** PACKET LENGTH = $length")
 
             if (length > 0) {
 
-                Log.i(TAG, "************new packet")
-                System.exit(-1)
-                while (packet.hasRemaining()) {
+                Log.i(TAG, "************new packet 1")
+//                System.exit(-1)
+                /*while (packet.hasRemaining()) {
                     Log.i(TAG, "" + packet.get())
-                }
+                }*/
                 // Write the outgoing packet to the tunnel.
                 packet.limit(length)
                 tunnel.write(packet);
@@ -142,7 +158,10 @@ class VpnFilter : VpnService(), Handler.Callback {
 
             }
             length = tunnel.read(packet)
+
             if (length > 0) {
+
+                Log.i(TAG, "************new packet 2")
                 // Ignore control messages, which start with zero.
                 if (packet.get(0).toInt() !== 0) {
                     // Write the incoming packet to the output stream.
@@ -158,7 +177,7 @@ class VpnFilter : VpnService(), Handler.Callback {
             }
             // If we are idle or waiting for the network, sleep for a
             // fraction of time to avoid busy looping.
-            /*if (idle) {
+            if (idle) {
                 Thread.sleep(100)
                 // Increase the timer. This is inaccurate but good enough,
                 // since everything is operated in non-blocking mode.
@@ -179,9 +198,16 @@ class VpnFilter : VpnService(), Handler.Callback {
                 if (timer > 20000) {
                     throw IllegalStateException("Timed out")
                 }
-            }*/
+            }
             Thread.sleep(50)
         }
+    }
+
+    override fun handleMessage(message: Message?): Boolean {
+        if (message != null) {
+            Toast.makeText(this, message.what, Toast.LENGTH_SHORT).show()
+        }
+        return true
     }
 
     fun getLocalIpAddress(): String? {
@@ -211,26 +237,6 @@ class VpnFilter : VpnService(), Handler.Callback {
         }
 
         return null
-    }
-
-    @Throws(Exception::class)
-    private fun configure() {
-        // If the old interface has exactly the same parameters, use it!
-        if (mInterface != null) {
-            Log.i(TAG, "Using the previous interface")
-            return
-        }
-
-        // Configure a builder while parsing the parameters.
-        builder.setSession(TAG)//.setMtu(1500)
-        builder.addAddress("10.0.0.2", 32).addRoute("0.0.0.0", 0)
-        try {
-            mInterface!!.close()
-        } catch (e: Exception) {
-            // ignore
-        }
-
-        mInterface = builder.establish()
     }
 
 

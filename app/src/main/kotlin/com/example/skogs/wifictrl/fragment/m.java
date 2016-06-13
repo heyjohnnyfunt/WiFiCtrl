@@ -22,7 +22,9 @@ import java.io.FileOutputStream;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+
 public class m extends VpnService implements Handler.Callback, Runnable {
+
     private static final String TAG = "ToyVpnService";
     private String mServerAddress;
     private String mServerPort;
@@ -32,6 +34,7 @@ public class m extends VpnService implements Handler.Callback, Runnable {
     private Thread mThread;
     private ParcelFileDescriptor mInterface;
     private String mParameters;
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // The handler is only used to show messages.
@@ -106,7 +109,6 @@ public class m extends VpnService implements Handler.Callback, Runnable {
             Log.i(TAG, "Exiting");
         }
     }
-
     private boolean run(InetSocketAddress server) throws Exception {
         DatagramChannel tunnel = null;
         boolean connected = false;

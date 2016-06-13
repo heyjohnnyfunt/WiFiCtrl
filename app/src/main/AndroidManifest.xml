@@ -22,8 +22,6 @@
 
         <service
                 android:name="com.example.skogs.wifictrl.model.VpnFilter"
-                android:enabled="true"
-                android:exported="true"
                 android:permission="android.permission.BIND_VPN_SERVICE" >
             <intent-filter>
                 <action android:name="android.net.VpnService" />

@@ -76,12 +76,12 @@ open class WifiActivity() : Activity() {
 
         transitionToList()
 
-        /*val intent = VpnService.prepare(this);
+        val intent = VpnService.prepare(this);
         if (intent != null) {
             startActivityForResult(intent, 0);
         } else {
             onActivityResult(0, RESULT_OK, null);
-        }*/
+        }
 
         wifiManager = getSystemService(Context.WIFI_SERVICE) as WifiManager
         if (wifiManager?.isWifiEnabled == false) {
@@ -91,13 +91,13 @@ open class WifiActivity() : Activity() {
 
     }
 
-    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
             val intent = Intent(this, VpnFilter::class.java);
             startService(intent);
         }
-    }*/
+    }
 
     private fun initToolbar() {
         toolbar = findViewById(R.id.toolbar) as Toolbar
